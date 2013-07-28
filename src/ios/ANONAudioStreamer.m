@@ -12,6 +12,33 @@
 
 @synthesize resourceURL, player, avSession;
 
+- (void)pluginInitialize
+{
+    self.avSession = [AVAudioSession sharedInstance];
+    NSError* __autoreleasing err = nil;
+    [self.avSession setCategory:AVAudioSessionCategoryPlayback error:&err];
+    [self.avSession setActive:YES error:nil];
+    
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(remoteControlReceivedWithEvent:) name:@"RemoteEvent" object:nil];
+}
+
+- (void) remoteControlReceivedWithEvent:(NSNotification *) notification
+{
+    NSDictionary *userInfo = notification.userInfo;
+    UIEvent *event = [userInfo objectForKey:@"Event"];
+    
+    if(event.type == UIEventTypeRemoteControl) {
+        if (event.subtype == UIEventSubtypeRemoteControlPlay) {
+            [self.player play];
+        } else if (event.subtype == UIEventSubtypeRemoteControlPause) {
+            [self.player pause];
+        } else if (event.subtype == UIEventSubtypeRemoteControlTogglePlayPause) {
+            [self.player pause];
+        }
+    }
+}
 
 - (void) startStreamPlayback:(CDVInvokedUrlCommand *)command
 {
@@ -30,10 +57,7 @@
 
 - (void) createStream:(CDVInvokedUrlCommand *)command
 {
-    self.avSession = [AVAudioSession sharedInstance];
-    NSError* __autoreleasing err = nil;
-    [self.avSession setCategory:AVAudioSessionCategoryPlayback error:&err];
-    [self.avSession setActive:YES error:nil];
+    [self.viewController.view resignFirstResponder];
     
     NSString* resourcePath = [command.arguments objectAtIndex:0];
     resourceURL = [NSURL URLWithString:resourcePath];
