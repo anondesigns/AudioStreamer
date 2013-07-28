@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+           id="com.anondesigns.cordova.plugins.audiostreamer"
+      version="0.1.0">
+
+    <name>AudioStreamer</name>
+
+    <!-- ios -->
+    <platform name="ios">
+
+        <config-file target="config.xml" parent="/*">
+		<feature name="Streamer">
+			<param name="ios-package" value="ANONAudioStreamer"/>
+		</feature>
+        </config-file>
+
+        <js-module src="www/streamer.js" name="console">
+            <clobbers target="window.Streamer" />
+        </js-module>
+
+	<header-file src="src/ios/ANONAudioStreamer.h" />
+	<source-file src="src/ios/ANONAudioStreamer.m" />
+
+    </platform>
+</plugin>
